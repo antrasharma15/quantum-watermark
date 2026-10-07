@@ -21,6 +21,8 @@ public class ImageWatermarker {
     /** Returns a NEW watermarked image; the original is not modified. */
     public static BufferedImage embed(BufferedImage src, String message) {
         byte[] data = message.getBytes(StandardCharsets.UTF_8);
+        if (data.length == 0)
+            throw new IllegalArgumentException("Message is empty");
         if (data.length > capacityBytes(src))
             throw new IllegalArgumentException("Message too large: " + data.length
                     + " bytes, image can hold " + capacityBytes(src) + " bytes");
@@ -50,7 +52,7 @@ public class ImageWatermarker {
         for (int i = 0; i < HEADER_BITS; i++) {
             length = (length << 1) | readBit(img, bitIndex++);
         }
-        if (length < 0 || length > capacityBytes(img))
+        if (length <= 0 || length > capacityBytes(img))
             throw new IllegalStateException("No valid watermark found (bad length header: " + length + ")");
 
         byte[] data = new byte[length];
